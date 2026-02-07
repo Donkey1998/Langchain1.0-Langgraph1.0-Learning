@@ -15,16 +15,14 @@ from langchain_core.messages import HumanMessage, SystemMessage
 
 # 加载环境变量
 load_dotenv()
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-
-if not GROQ_API_KEY or GROQ_API_KEY == "your_groq_api_key_here":
-    raise ValueError(
-        "\n请先在 .env 文件中设置有效的 GROQ_API_KEY\n"
-        "访问 https://console.groq.com/keys 获取免费密钥"
-    )
+API_KEY = os.getenv("API_KEY")
+BASE_URL = os.getenv("BASE_URL")
+MODEL = os.getenv("MODEL")
+MODEL_PROVIDER = os.getenv("MODEL_PROVIDER")
 
 # 初始化模型
-model = init_chat_model("groq:llama-3.3-70b-versatile", api_key=GROQ_API_KEY)
+model = init_chat_model(model=MODEL, model_provider=MODEL_PROVIDER, api_key=API_KEY, base_url=BASE_URL)
+
 
 # ============================================================
 # 示例 1：评分路由系统
@@ -146,7 +144,11 @@ def score_based_routing():
         graph.add_edge(node, END)
     
     app = graph.compile()
-    
+
+    # 打印图结构
+    print("\n图结构:")
+    app.get_graph().print_ascii()
+
     # 测试不同质量的内容
     test_contents = [
         "Python 是一种广泛使用的高级编程语言，以其清晰的语法和强大的功能著称。它支持多种编程范式，包括面向对象、函数式和过程式编程。Python 拥有丰富的标准库和第三方库，广泛应用于 Web 开发、数据科学、人工智能等领域。",
@@ -251,7 +253,11 @@ def retry_mechanism():
     graph.add_edge("fallback", END)
     
     app = graph.compile()
-    
+
+    # 打印图结构
+    print("\n图结构:")
+    app.get_graph().print_ascii()
+
     # 运行多次测试
     for i in range(3):
         print(f"\n--- 测试 {i + 1} ---")
@@ -405,7 +411,11 @@ def complex_decision_tree():
         graph.add_edge(node, END)
     
     app = graph.compile()
-    
+
+    # 打印图结构
+    print("\n图结构:")
+    app.get_graph().print_ascii()
+
     # 测试不同的申请案例
     test_cases = [
         {"applicant_name": "张三", "credit_score": 800, "income": 20000, "loan_amount": 500000, "has_collateral": True},
@@ -428,8 +438,8 @@ if __name__ == "__main__":
     print("条件路由教程")
     print("=" * 60)
     
-    score_based_routing()
-    retry_mechanism()
+    # score_based_routing()
+    # retry_mechanism()
     complex_decision_tree()
     
     print("\n" + "=" * 60)

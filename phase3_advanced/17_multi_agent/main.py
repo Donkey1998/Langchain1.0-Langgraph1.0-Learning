@@ -15,16 +15,14 @@ from langchain_core.tools import tool
 
 # 加载环境变量
 load_dotenv()
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-
-if not GROQ_API_KEY or GROQ_API_KEY == "your_groq_api_key_here":
-    raise ValueError(
-        "\n请先在 .env 文件中设置有效的 GROQ_API_KEY\n"
-        "访问 https://console.groq.com/keys 获取免费密钥"
-    )
+API_KEY = os.getenv("API_KEY")
+BASE_URL = os.getenv("BASE_URL")
+MODEL = os.getenv("MODEL")
+MODEL_PROVIDER = os.getenv("MODEL_PROVIDER")
 
 # 初始化模型
-model = init_chat_model("groq:llama-3.3-70b-versatile", api_key=GROQ_API_KEY)
+model = init_chat_model(model=MODEL, model_provider=MODEL_PROVIDER, api_key=API_KEY, base_url=BASE_URL)
+
 
 # ============================================================
 # 定义工具
@@ -190,7 +188,19 @@ def supervisor_pattern():
     
     # 编译并运行
     app = graph.compile()
-    
+
+    # 可视化图结构
+    print("\n" + "=" * 60)
+    print("📊 图结构可视化 (ASCII)")
+    print("=" * 60)
+    app.get_graph().print_ascii()
+
+    print("\n" + "=" * 60)
+    print("📊 图结构可视化 (Mermaid)")
+    print("=" * 60)
+    mermaid_code = app.get_graph().draw_mermaid()
+    print(mermaid_code)
+
     result = app.invoke({
         "task": "写一篇关于人工智能发展的简短介绍",
         "messages": []

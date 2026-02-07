@@ -26,22 +26,22 @@ from langchain.agents import create_agent  # ✅ LangChain 1.0 API
 from langgraph.checkpoint.memory import MemorySaver  # 用于多轮对话
 
 # 导入自定义工具
-from weather import get_weather
-from calculator import calculator
-from web_search import web_search
+from tools.weather import get_weather
+from tools.calculator import calculator
+from tools.web_search import web_search
 
 # 加载环境变量
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+API_KEY = os.getenv("API_KEY")
+BASE_URL = os.getenv("BASE_URL")
+MODEL = os.getenv("MODEL")
+MODEL_PROVIDER = os.getenv("MODEL_PROVIDER")
 
-if not GROQ_API_KEY or GROQ_API_KEY == "your_groq_api_key_here":
-    raise ValueError(
-        "\n请先在 .env 文件中设置有效的 GROQ_API_KEY\n"
-        "访问 https://console.groq.com/keys 获取免费密钥"
-    )
+
 
 # 初始化模型
-model = init_chat_model("groq:llama-3.3-70b-versatile", api_key=GROQ_API_KEY)
+model = init_chat_model(model=MODEL, model_provider=MODEL_PROVIDER, api_key=API_KEY, base_url=BASE_URL)
 
 
 

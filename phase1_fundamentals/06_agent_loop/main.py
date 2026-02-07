@@ -33,15 +33,14 @@ from weather import get_weather
 # 加载环境变量
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+API_KEY = os.getenv("API_KEY")
+BASE_URL = os.getenv("BASE_URL")
+MODEL = os.getenv("MODEL")
+MODEL_PROVIDER = os.getenv("MODEL_PROVIDER")
 
-if not GROQ_API_KEY or GROQ_API_KEY == "your_groq_api_key_here":
-    raise ValueError(
-        "\n请先在 .env 文件中设置有效的 GROQ_API_KEY\n"
-        "访问 https://console.groq.com/keys 获取免费密钥"
-    )
 
 # 初始化模型
-model = init_chat_model("groq:llama-3.3-70b-versatile", api_key=GROQ_API_KEY)
+model = init_chat_model(model=MODEL, model_provider=MODEL_PROVIDER, api_key=API_KEY, base_url=BASE_URL)
 
 
 
@@ -69,7 +68,7 @@ def example_1_understand_loop():
         "messages": [{"role": "user", "content": "25 乘以 8 等于多少？"}]
     })
 
-    print("\n完整消息历史：")
+    print(f"\n完整消息历史：{response}")
     for i, msg in enumerate(response['messages'], 1):
         print(f"\n{'='*60}")
         print(f"消息 {i}: {msg.__class__.__name__}")
@@ -126,16 +125,19 @@ def example_2_streaming():
     # 使用 stream 方法
     for chunk in agent.stream({
         "messages": [{"role": "user", "content": "北京天气如何？"}]
-    }):
+    }): 
+        print(f"chunk: {chunk}")
         # chunk 是字典，包含更新的状态
-        if 'messages' in chunk:
-            # 获取最新的消息
-            latest_msg = chunk['messages'][-1]
+        # chunk 结构: {'model': {'messages': [...]}} 或 {'tools': {'messages': [...]}}
+        for key in chunk:
+            if 'messages' in chunk[key]:
+                # 获取最新的消息
+                latest_msg = chunk[key]['messages'][-1]
 
-            # 如果是 AI 的最终回答
-            if hasattr(latest_msg, 'content') and latest_msg.content:
-                if not hasattr(latest_msg, 'tool_calls') or not latest_msg.tool_calls:
-                    print(f"\n最终回答: {latest_msg.content}")
+                # 如果是 AI 的最终回答
+                if hasattr(latest_msg, 'content') and latest_msg.content:
+                    if not hasattr(latest_msg, 'tool_calls') or not latest_msg.tool_calls:
+                        print(f"\n最终回答: {latest_msg.content}")
 
     print("\n关键点：")
     print("  - stream() 返回生成器，逐步返回结果")
@@ -209,16 +211,18 @@ def example_4_inspect_state():
         step += 1
         print(f"\n步骤 {step}:")
 
-        if 'messages' in chunk:
-            latest = chunk['messages'][-1]
-            msg_type = latest.__class__.__name__
-            print(f"  类型: {msg_type}")
+        # chunk 结构: {'model': {'messages': [...]}} 或 {'tools': {'messages': [...]}}
+        for key in chunk:
+            if 'messages' in chunk[key]:
+                latest = chunk[key]['messages'][-1]
+                msg_type = latest.__class__.__name__
+                print(f"  类型: {msg_type}")
 
-            if hasattr(latest, 'tool_calls') and latest.tool_calls:
-                print(f"  工具调用: {latest.tool_calls[0]['name']}")
-            elif hasattr(latest, 'content') and latest.content:
-                content_preview = latest.content[:50] if len(latest.content) > 50 else latest.content
-                print(f"  内容: {content_preview}...")
+                if hasattr(latest, 'tool_calls') and latest.tool_calls:
+                    print(f"  工具调用: {latest.tool_calls[0]['name']}")
+                elif hasattr(latest, 'content') and latest.content:
+                    content_preview = latest.content[:50] if len(latest.content) > 50 else latest.content
+                    print(f"  内容: {content_preview}...")
 
     print("\n关键点：")
     print("  - stream 让你看到每个步骤")

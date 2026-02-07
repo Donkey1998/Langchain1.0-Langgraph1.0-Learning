@@ -214,11 +214,21 @@ regex>=2024.0.0
 # Google 搜索
 # google-search-results>=2.4.0
 
-# DuckDuckGo 搜索
-# duckduckgo-search>=6.0.0
+# DuckDuckGo 搜索（模块 24 - MCP 集成需要）
+duckduckgo-search>=6.0.0
 
 # Wikipedia
 # wikipedia>=1.4.0
+
+# arXiv 论文搜索
+# arxiv>=2.1.0
+
+# ----------------------------------------------------------------------------
+# MCP (Model Context Protocol) - 模块 24 专用
+# ----------------------------------------------------------------------------
+
+# MCP 官方 Python SDK
+mcp>=1.7.1,<2.0.0
 
 # arXiv 论文搜索
 # arxiv>=2.1.0

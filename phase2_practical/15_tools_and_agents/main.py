@@ -15,16 +15,13 @@ from langchain.agents import create_agent  # LangChain 1.0 统一 API
 
 # 加载环境变量
 load_dotenv()
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-if not GROQ_API_KEY or GROQ_API_KEY == "your_groq_api_key_here":
-    raise ValueError(
-        "\n请先在 .env 文件中设置有效的 GROQ_API_KEY\n"
-        "访问 https://console.groq.com/keys 获取免费密钥"
-    )
-
+API_KEY = os.getenv("API_KEY")
+BASE_URL = os.getenv("BASE_URL")
+MODEL = os.getenv("MODEL")
+MODEL_PROVIDER = os.getenv("MODEL_PROVIDER")
 # 初始化模型
-model = init_chat_model("groq:llama-3.3-70b-versatile", api_key=GROQ_API_KEY)
+model = init_chat_model(model=MODEL, model_provider=MODEL_PROVIDER, api_key=API_KEY, base_url=BASE_URL)
 
 # ============================================================
 # 示例 1: 高级工具定义与参数验证
@@ -494,9 +491,9 @@ def example_5_complete_agent():
     
     # 确定使用哪个模型
     if os.getenv("DEEPSEEK_API_KEY"):
-        model = init_chat_model("deepseek-chat", model_provider="deepseek")
+        model = init_chat_model(model=MODEL, model_provider=MODEL_PROVIDER, api_key=API_KEY, base_url=BASE_URL)
     else:
-        model = init_chat_model("gpt-3.5-turbo", model_provider="openai")
+        model = init_chat_model(model=MODEL, model_provider=MODEL_PROVIDER, api_key=API_KEY, base_url=BASE_URL)
     
     tools = [check_order, get_faq, calculate_shipping]
     memory = MemorySaver()
